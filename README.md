@@ -25,16 +25,20 @@ So I decided to go further: **flash ESPHome** and have total, local control with
 
 ## Current status
 
-**IT WORKS!** All 8 valves and 8 LEDs operate correctly with the 2 independent shift registers topology.
+**100% FUNCTIONAL!** All hardware features operate correctly.
 
 - ✅ WiFi connected, web UI accessible, Home Assistant API operational
 - ✅ OTA working (wireless updates)
 - ✅ 8 valves individually controlled
 - ✅ 8 LEDs synced with their valves (turn on when valve opens)
-- ✅ Sprinkler component active (scheduling, durations, auto-advance)
-- ✅ Touch buttons: previous/next/start/stop
+- ✅ Sprinkler component active (scheduling, adjustable durations from web, auto-advance)
+- ✅ Buzzer P14: confirmation beep on button press
+- ✅ Touch buttons functional:
+  - **UP** (P7): next zone
+  - **DOWN** (P6): previous zone
+  - **SET/Circle** (P8): smart toggle — if navigated with arrows, waters only that zone; otherwise full 8-zone cycle; if watering, stops everything
+- ✅ Irrigation durations persist in flash (adjustable from web without Home Assistant)
 - ⚠️ WiFi LED (P28): under testing
-- ⚠️ Rain sensor (P14): no physical sensor connected
 
 ## Files
 

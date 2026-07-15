@@ -36,16 +36,20 @@ Una vez flasheado, las actualizaciones son **OTA** (por WiFi, sin cables).
 
 ## Estado actual
 
-**¡FUNCIONA!** Las 8 válvulas y los 8 LEDs operan correctamente con la topología de 2 shift registers independientes.
+**¡100% FUNCIONAL!** Todas las características del hardware operan correctamente.
 
 - ✅ WiFi conectado, web UI accesible, API de Home Assistant operativa
 - ✅ OTA funcionando (actualizaciones inalámbricas)
 - ✅ 8 válvulas controladas individualmente
 - ✅ 8 LEDs sincronizados con sus válvulas (encienden al abrir)
-- ✅ Componente Sprinkler activo (programación, duraciones, auto-avance)
-- ✅ Botones táctiles: anterior/siguiente/iniciar/parar
+- ✅ Componente Sprinkler activo (programación, duraciones ajustables desde web, auto-avance)
+- ✅ Buzzer P14: pitido de confirmación al pulsar botones
+- ✅ Botones táctiles funcionales:
+  - **UP** (P7): zona siguiente
+  - **DOWN** (P6): zona anterior
+  - **SET/Círculo** (P8): toggle inteligente — si se navegó con flechas, riega solo esa zona; si no, ciclo completo de 8 zonas; si está regando, para todo
+- ✅ Tiempos de riego persistentes en flash (ajustables desde web sin Home Assistant)
 - ⚠️ LED WiFi (P28): en pruebas
-- ⚠️ Sensor de lluvia (P14): sin sensor físico conectado
 
 ## Archivos
 
