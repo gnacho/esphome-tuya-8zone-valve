@@ -40,6 +40,44 @@ So I decided to go further: **flash ESPHome** and have total, local control with
 - ✅ Irrigation durations persist in flash (adjustable from web without Home Assistant)
 - ⚠️ WiFi LED (P28): under testing
 
+## The flashing
+
+The BK7231N is flashed via UART with [ltchiptool](https://github.com/libretiny-eu/ltchiptool). **No soldering required** — dupont cables and a steady hand are enough to make contact on the pins.
+
+### Connections (3.3V USB-TTL adapter)
+
+```
+  USB-TTL Adapter            TY-W-8L-AC-DZAK Board
+  ───────────────            ─────────────────────
+       3.3V  ───────────────────►  3.3V
+        GND  ───────────────────►  GND
+         TX  ───────────────────►  RX
+         RX  ◄───────────────────  TX
+```
+
+**IMPORTANT**: The board is powered by **24VAC** (its internal regulator generates 3.3V). The USB-TTL adapter is only for communication, NOT for power.
+
+### Process
+
+1. **Connect the 4 dupont cables** (3.3V, GND, TX↔RX crossed)
+2. **Power the board** with 24VAC
+3. **Enter download mode**: briefly touch RST to GND (a couple of quick taps)
+4. **Run the command** immediately after the reset
+
+### Backup original firmware (recommended)
+
+```bash
+ltchiptool flash read bk7231n backup_original.bin
+```
+
+### Flash ESPHome
+
+```bash
+ltchiptool flash write bk7231n irrigador-8z-sep.bin
+```
+
+Once flashed, updates are **OTA** (via WiFi, no cables).
+
 ## Files
 
 | File | Description |
