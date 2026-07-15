@@ -120,14 +120,40 @@ ltchiptool flash read bk7231n backup_original.bin
 
 ## Using the buttons
 
-- **UP** (up arrow): advance to next zone
-- **DOWN** (down arrow): go back to previous zone
-- **SET/Circle**: 
-  - If you used arrows to choose a zone → waters **only that zone**
-  - If you didn't touch anything → waters **all 8 zones in full cycle**
-  - If it's watering → **stops everything**
+### Navigation and zone selection
 
-Each time you press a button, a **beep** sounds for confirmation.
+- **UP** (up arrow): selects the next zone (LED blinks)
+- **DOWN** (down arrow): selects the previous zone (LED blinks)
+- **SET/Circle**: confirms selection and activates the zone (LED stays solid)
+
+If you don't press anything for **8 seconds**, the selection is automatically cancelled and LEDs return to normal.
+
+### Activate a single zone
+
+1. Press UP or DOWN until the desired zone LED blinks
+2. Press circle → the zone activates (solid LED)
+3. To stop it: navigate with arrows to that zone (blinks over solid LED) and press circle
+
+### Activate all zones (full cycle)
+
+1. Hold **UP** for **4 seconds** until all LEDs blink
+2. Press circle → all 8 zones activate in full cycle (3 confirmation beeps)
+
+### Stop all irrigation
+
+1. Hold **DOWN** for **4 seconds** until all LEDs blink
+2. Press circle → all zones close (3 confirmation beeps)
+
+### Without prior selection
+
+If you press circle without touching any arrow, all 8 zones activate in full cycle.
+
+### Notes
+
+- Each button press produces a short confirmation beep
+- Irrigation times are adjusted from the web (default 5 min per zone)
+- With "Auto Advance" enabled, zones run in order with 5s overlap
+- Pin P26 is reserved for a possible fourth button (not present on this PCB)
 
 ## Adjusting irrigation times
 

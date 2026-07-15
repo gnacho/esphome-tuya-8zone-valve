@@ -127,10 +127,10 @@ switch:
       inverted: false
     on_turn_on:
       then:
-        - output.turn_on: led_1
+        - lambda: if (id(selected_zone) != 0) id(led_1)->turn_on();
     on_turn_off:
       then:
-        - output.turn_off: led_1
+        - lambda: if (id(selected_zone) != 1) id(led_1)->turn_off();
   - platform: gpio
     id: valve_2
     name: "Válvula 2"
@@ -140,10 +140,10 @@ switch:
       inverted: false
     on_turn_on:
       then:
-        - output.turn_on: led_2
+        - lambda: if (id(selected_zone) != 1) id(led_2)->turn_on();
     on_turn_off:
       then:
-        - output.turn_off: led_2
+        - lambda: if (id(selected_zone) != 2) id(led_2)->turn_off();
   - platform: gpio
     id: valve_3
     name: "Válvula 3"
@@ -153,10 +153,10 @@ switch:
       inverted: false
     on_turn_on:
       then:
-        - output.turn_on: led_3
+        - lambda: if (id(selected_zone) != 2) id(led_3)->turn_on();
     on_turn_off:
       then:
-        - output.turn_off: led_3
+        - lambda: if (id(selected_zone) != 3) id(led_3)->turn_off();
   - platform: gpio
     id: valve_4
     name: "Válvula 4"
@@ -166,10 +166,10 @@ switch:
       inverted: false
     on_turn_on:
       then:
-        - output.turn_on: led_4
+        - lambda: if (id(selected_zone) != 3) id(led_4)->turn_on();
     on_turn_off:
       then:
-        - output.turn_off: led_4
+        - lambda: if (id(selected_zone) != 4) id(led_4)->turn_off();
   - platform: gpio
     id: valve_5
     name: "Válvula 5"
@@ -179,10 +179,10 @@ switch:
       inverted: false
     on_turn_on:
       then:
-        - output.turn_on: led_5
+        - lambda: if (id(selected_zone) != 4) id(led_5)->turn_on();
     on_turn_off:
       then:
-        - output.turn_off: led_5
+        - lambda: if (id(selected_zone) != 5) id(led_5)->turn_off();
   - platform: gpio
     id: valve_6
     name: "Válvula 6"
@@ -192,10 +192,10 @@ switch:
       inverted: false
     on_turn_on:
       then:
-        - output.turn_on: led_6
+        - lambda: if (id(selected_zone) != 5) id(led_6)->turn_on();
     on_turn_off:
       then:
-        - output.turn_off: led_6
+        - lambda: if (id(selected_zone) != 6) id(led_6)->turn_off();
   - platform: gpio
     id: valve_7
     name: "Válvula 7"
@@ -205,10 +205,10 @@ switch:
       inverted: false
     on_turn_on:
       then:
-        - output.turn_on: led_7
+        - lambda: if (id(selected_zone) != 6) id(led_7)->turn_on();
     on_turn_off:
       then:
-        - output.turn_off: led_7
+        - lambda: if (id(selected_zone) != 7) id(led_7)->turn_off();
   - platform: gpio
     id: valve_8
     name: "Válvula 8"
@@ -218,69 +218,195 @@ switch:
       inverted: false
     on_turn_on:
       then:
-        - output.turn_on: led_8
+        - lambda: if (id(selected_zone) != 7) id(led_8)->turn_on();
     on_turn_off:
       then:
-        - output.turn_off: led_8
+        - lambda: if (id(selected_zone) != 8) id(led_8)->turn_off();
 
 globals:
-  - id: manual_zone
-    type: bool
-    initial_value: "false"
+  - id: selected_zone
+    type: int
+    initial_value: "-1"
+  - id: all_zones_mode
+    type: int
+    initial_value: "0"
+  - id: last_button_time
+    type: uint32_t
+    initial_value: "0"
 
-script:
-  - id: toggle_riego
+interval:
+  - interval: 500ms
     then:
       - lambda: |
-          if (id(irrigador).active_valve().has_value()) {
-            id(irrigador).shutdown();
-            id(manual_zone) = false;
-          } else if (id(manual_zone)) {
-            auto valve = id(irrigador).active_valve();
-            if (valve.has_value()) {
-              for (size_t i = 0; i < 8; i++) {
-                if (i == valve.value()) {
-                  id(irrigador).enable_switch(i)->turn_on();
+          uint32_t now = millis();
+          if ((id(selected_zone) >= 0 || id(all_zones_mode) != 0) && (now - id(last_button_time)) > 8000) {
+            id(cancel_selection)->execute();
+            return;
+          }
+          
+          if (id(selected_zone) >= 0 && id(all_zones_mode) == 0) {
+            static bool blink_state = false;
+            blink_state = !blink_state;
+            auto leds = {id(led_1), id(led_2), id(led_3), id(led_4), id(led_5), id(led_6), id(led_7), id(led_8)};
+            int i = 0;
+            for (auto led : leds) {
+              if (i == id(selected_zone)) {
+                if (blink_state) led->turn_on();
+                else led->turn_off();
+              } else {
+                auto valve_id = id(irrigador).valve_switch(i);
+                if (valve_id != nullptr && valve_id->state) {
+                  led->turn_on();
                 } else {
-                  id(irrigador).enable_switch(i)->turn_off();
+                  led->turn_off();
                 }
               }
+              i++;
             }
-            id(irrigador).resume_or_start_full_cycle();
-          } else {
-            for (size_t i = 0; i < 8; i++) {
-              id(irrigador).enable_switch(i)->turn_on();
+          } else if (id(all_zones_mode) != 0) {
+            static bool blink_all = false;
+            blink_all = !blink_all;
+            auto leds = {id(led_1), id(led_2), id(led_3), id(led_4), id(led_5), id(led_6), id(led_7), id(led_8)};
+            for (auto led : leds) {
+              if (blink_all) led->turn_on();
+              else led->turn_off();
             }
-            id(irrigador).resume_or_start_full_cycle();
           }
+
+script:
+  - id: beep_3_times
+    then:
+      - output.turn_on: buzzer
+      - delay: 80ms
+      - output.turn_off: buzzer
+      - delay: 80ms
+      - output.turn_on: buzzer
+      - delay: 80ms
+      - output.turn_off: buzzer
+      - delay: 80ms
+      - output.turn_on: buzzer
+      - delay: 80ms
+      - output.turn_off: buzzer
+
+  - id: cancel_selection
+    then:
+      - lambda: |
+          id(selected_zone) = -1;
+          id(all_zones_mode) = 0;
+          auto leds = {id(led_1), id(led_2), id(led_3), id(led_4), id(led_5), id(led_6), id(led_7), id(led_8)};
+          int i = 0;
+          for (auto led : leds) {
+            auto valve_id = id(irrigador).valve_switch(i);
+            if (valve_id != nullptr && valve_id->state) {
+              led->turn_on();
+            } else {
+              led->turn_off();
+            }
+            i++;
+          }
+
+  - id: activate_zone
+    parameters:
+      zone: int
+    then:
+      - lambda: |
+          for (size_t i = 0; i < 8; i++) {
+            if (i == zone) {
+              id(irrigador).enable_switch(i)->turn_on();
+            } else {
+              id(irrigador).enable_switch(i)->turn_off();
+            }
+          }
+          id(irrigador).resume_or_start_full_cycle();
+          id(selected_zone) = -1;
+          id(all_zones_mode) = 0;
+
+  - id: activate_all_zones
+    then:
+      - lambda: |
+          for (size_t i = 0; i < 8; i++) {
+            id(irrigador).enable_switch(i)->turn_on();
+          }
+          id(irrigador).resume_or_start_full_cycle();
+          id(all_zones_mode) = 0;
+          id(selected_zone) = -1;
+
+  - id: stop_all_zones
+    then:
+      - lambda: |
+          id(irrigador).shutdown();
+          id(all_zones_mode) = 0;
+          id(selected_zone) = -1;
 
 binary_sensor:
   - platform: gpio
     pin:
-      number: P7
-      inverted: true
-    name: "Botón UP (P7)"
-    internal: true
-    on_press:
-      then:
-        - output.turn_on: buzzer
-        - delay: 100ms
-        - output.turn_off: buzzer
-        - lambda: id(manual_zone) = true;
-        - sprinkler.next_valve: irrigador
-  - platform: gpio
-    pin:
       number: P6
       inverted: true
-    name: "Botón DOWN (P6)"
+    name: "Botón UP (P6)"
     internal: true
-    on_press:
-      then:
-        - output.turn_on: buzzer
-        - delay: 100ms
-        - output.turn_off: buzzer
-        - lambda: id(manual_zone) = true;
-        - sprinkler.previous_valve: irrigador
+    on_multi_click:
+      - timing:
+          - ON for at least 4s
+        then:
+          - output.turn_on: buzzer
+          - delay: 100ms
+          - output.turn_off: buzzer
+          - lambda: |
+              id(all_zones_mode) = 1;
+              id(selected_zone) = -1;
+              id(last_button_time) = millis();
+      - timing:
+          - ON for at most 3999ms
+        then:
+          - output.turn_on: buzzer
+          - delay: 100ms
+          - output.turn_off: buzzer
+          - lambda: |
+              int current = id(selected_zone);
+              if (current < 0) {
+                auto av = id(irrigador).active_valve();
+                current = av.has_value() ? av.value() : -1;
+              }
+              int next = (current + 1) % 8;
+              id(selected_zone) = next;
+              id(all_zones_mode) = 0;
+              id(last_button_time) = millis();
+
+  - platform: gpio
+    pin:
+      number: P7
+      inverted: true
+    name: "Botón DOWN (P7)"
+    internal: true
+    on_multi_click:
+      - timing:
+          - ON for at least 4s
+        then:
+          - output.turn_on: buzzer
+          - delay: 100ms
+          - output.turn_off: buzzer
+          - lambda: |
+              id(all_zones_mode) = 2;
+              id(selected_zone) = -1;
+              id(last_button_time) = millis();
+      - timing:
+          - ON for at most 3999ms
+        then:
+          - output.turn_on: buzzer
+          - delay: 100ms
+          - output.turn_off: buzzer
+          - lambda: |
+              int current = id(selected_zone);
+              if (current < 0) {
+                auto av = id(irrigador).active_valve();
+                current = av.has_value() ? av.value() : 8;
+              }
+              int prev = (current + 7) % 8;
+              id(selected_zone) = prev;
+              id(all_zones_mode) = 0;
+              id(last_button_time) = millis();
+
   - platform: gpio
     pin:
       number: P8
@@ -292,8 +418,35 @@ binary_sensor:
         - output.turn_on: buzzer
         - delay: 100ms
         - output.turn_off: buzzer
-        - script.execute: toggle_riego
+        - lambda: |
+            if (id(all_zones_mode) == 1) {
+              id(activate_all_zones)->execute();
+              id(beep_3_times)->execute();
+            } else if (id(all_zones_mode) == 2) {
+              id(stop_all_zones)->execute();
+              id(beep_3_times)->execute();
+            } else if (id(selected_zone) >= 0) {
+              auto current = id(irrigador).active_valve();
+              if (current.has_value() && current.value() == id(selected_zone)) {
+                id(irrigador).shutdown();
+                id(selected_zone) = -1;
+              } else {
+                id(activate_zone)->execute(id(selected_zone));
+              }
+            } else {
+              for (size_t i = 0; i < 8; i++) {
+                id(irrigador).enable_switch(i)->turn_on();
+              }
+              id(irrigador).resume_or_start_full_cycle();
+            }
 
+  # P26: Botón no identificado en PCB actual. Reservado para uso futuro.
+  # - platform: gpio
+  #   pin:
+  #     number: P26
+  #     inverted: true
+  #   name: "Botón P26 (reservado)"
+  #   internal: true
 
 sprinkler:
   - id: irrigador

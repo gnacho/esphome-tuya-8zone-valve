@@ -119,14 +119,40 @@ ltchiptool flash read bk7231n backup_original.bin
 
 ## Uso de los botones
 
-- **UP** (flecha arriba): avanza a la zona siguiente
-- **DOWN** (flecha abajo): retrocede a la zona anterior
-- **SET/Círculo**: 
-  - Si usaste las flechas para elegir zona → riega **solo esa zona**
-  - Si no tocaste nada → riega **las 8 zonas en ciclo completo**
-  - Si está regando → **para todo**
+### Navegación y selección de zona
 
-Cada vez que pulsas un botón, suena un **pitido** de confirmación.
+- **UP** (flecha arriba): selecciona la zona siguiente (el LED parpadea)
+- **DOWN** (flecha abajo): selecciona la zona anterior (el LED parpadea)
+- **SET/Círculo**: confirma la selección y activa la zona (el LED queda fijo)
+
+Si no pulsas nada durante **8 segundos**, la selección se cancela automáticamente y los LEDs vuelven a su estado normal.
+
+### Activar una zona individual
+
+1. Pulsa UP o DOWN hasta que parpadee el LED de la zona deseada
+2. Pulsa círculo → la zona se activa (LED fijo)
+3. Para apagarla: navega con flechas hasta esa zona (parpadea sobre el LED fijo) y pulsa círculo
+
+### Activar todas las zonas (ciclo completo)
+
+1. Mantén **UP** presionado **4 segundos** hasta que todos los LEDs parpadeen
+2. Pulsa círculo → se activan las 8 zonas en ciclo completo (3 pitidos de confirmación)
+
+### Parar todo el riego
+
+1. Mantén **DOWN** presionado **4 segundos** hasta que todos los LEDs parpadeen
+2. Pulsa círculo → se cierran todas las zonas (3 pitidos de confirmación)
+
+### Sin selección previa
+
+Si pulsas círculo sin haber tocado ninguna flecha, se activan las 8 zonas en ciclo completo.
+
+### Notas
+
+- Cada pulsación de botón produce un pitido corto de confirmación
+- Los tiempos de riego se ajustan desde la web (por defecto 5 min por zona)
+- Con "Auto Avance" activado, las zonas se ejecutan en orden con 5s de solapamiento
+- El pin P26 está reservado para un posible cuarto botón (no presente en esta PCB)
 
 ## Ajustar tiempos de riego
 
