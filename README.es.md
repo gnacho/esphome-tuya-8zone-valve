@@ -25,12 +25,39 @@ Así que decidí ir más allá: **flashear ESPHome** y tener control total, loca
 
 ## El flasheo
 
-El BK7231N se flashea por UART con [ltchiptool](https://github.com/libretiny-eu/ltchiptool). El proceso:
+El BK7231N se flashea por UART con [ltchiptool](https://github.com/libretiny-eu/ltchiptool). **No necesitas soldar** — con cables dupont y buen pulso puedes hacer contacto en los pines.
 
-1. Abrir el dispositivo y localizar los pines UART (TX, RX, GND, 3.3V)
-2. Poner en modo descarga (puentear RST a GND durante el arranque)
-3. Alimentar por 24VAC (el regulador interno genera los 3.3V)
-4. Flashear con `ltchiptool flash`
+### Conexiones (adaptador USB-TTL 3.3V)
+
+```
+  Adaptador USB-TTL          Placa TY-W-8L-AC-DZAK
+  ─────────────────          ─────────────────────
+       3.3V  ───────────────────►  3.3V
+        GND  ───────────────────►  GND
+         TX  ───────────────────►  RX
+         RX  ◄───────────────────  TX
+```
+
+**IMPORTANTE**: La placa se alimenta por **24VAC** (su regulador interno genera los 3.3V). El adaptador USB-TTL solo se usa para comunicación, NO para alimentar.
+
+### Proceso
+
+1. **Conecta los 4 cables** dupont (3.3V, GND, TX↔RX cruzados)
+2. **Alimenta la placa** con 24VAC
+3. **Pon en modo descarga**: toca brevemente RST con GND (un par de toques rápidos)
+4. **Lanza el comando** inmediatamente después del reset
+
+### Backup del firmware original (recomendado)
+
+```bash
+ltchiptool flash read bk7231n backup_original.bin
+```
+
+### Flasheo de ESPHome
+
+```bash
+ltchiptool flash write bk7231n irrigador-8z-sep.bin
+```
 
 Una vez flasheado, las actualizaciones son **OTA** (por WiFi, sin cables).
 
