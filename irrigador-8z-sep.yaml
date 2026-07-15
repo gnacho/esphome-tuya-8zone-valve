@@ -223,12 +223,30 @@ switch:
       then:
         - output.turn_off: led_8
 
+globals:
+  - id: manual_zone
+    type: bool
+    initial_value: "false"
+
 script:
   - id: toggle_riego
     then:
       - lambda: |
           if (id(irrigador).active_valve().has_value()) {
             id(irrigador).shutdown();
+            id(manual_zone) = false;
+          } else if (id(manual_zone)) {
+            auto valve = id(irrigador).active_valve();
+            if (valve.has_value()) {
+              for (size_t i = 0; i < 8; i++) {
+                if (i == valve.value()) {
+                  id(irrigador).enable_switch(i)->turn_on();
+                } else {
+                  id(irrigador).enable_switch(i)->turn_off();
+                }
+              }
+            }
+            id(irrigador).resume_or_start_full_cycle();
           } else {
             for (size_t i = 0; i < 8; i++) {
               id(irrigador).enable_switch(i)->turn_on();
@@ -248,6 +266,7 @@ binary_sensor:
         - output.turn_on: buzzer
         - delay: 100ms
         - output.turn_off: buzzer
+        - lambda: id(manual_zone) = true;
         - sprinkler.next_valve: irrigador
   - platform: gpio
     pin:
@@ -260,6 +279,7 @@ binary_sensor:
         - output.turn_on: buzzer
         - delay: 100ms
         - output.turn_off: buzzer
+        - lambda: id(manual_zone) = true;
         - sprinkler.previous_valve: irrigador
   - platform: gpio
     pin:
