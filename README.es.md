@@ -17,17 +17,37 @@ Así que decidí ir más allá: **flashear ESPHome** y tener control total, loca
 - **Shift registers**: 2x 74HC595 **independientes** (no en cascada)
   - **SR de LEDs** (U2): data P9, clock P15, latch P17 → 8 LEDs de estado D1..D8
   - **SR de válvulas** (U3): data P16, clock P22, latch P20 → 8 triacs BT134 → bornas Z1..Z8
-- **Buzzer**: P14
+- **Buzzer**: P14 (pitido al pulsar botones)
 - **LED WiFi**: P28
-- **Alimentación**: 24 VAC
-- **Botones táctiles**: P6, P7, P8, P26 (anterior/next/start/stop)
-- **Sensor de lluvia**: P14 (entrada, para sensor externo)
+- **Alimentación**: 24 VAC (transformador externo)
+- **Botones táctiles**: UP (P7), DOWN (P6), SET/Círculo (P8)
 
-## El flasheo
+## Cómo flashear (paso a paso)
 
-El BK7231N se flashea por UART con [ltchiptool](https://github.com/libretiny-eu/ltchiptool). **No necesitas soldar** — con cables dupont y buen pulso puedes hacer contacto en los pines.
+### Qué necesitas
 
-### Conexiones (adaptador USB-TTL 3.3V)
+1. **Adaptador USB-TTL 3.3V** (también llamado "adaptador serial USB" o "CP2102/CH340/FT232"). Cuesta ~3-5€ en AliExpress o Amazon. **IMPORTANTE**: debe ser de **3.3V**, NO de 5V (puedes freír la placa).
+2. **4 cables dupont** (cables con conectores hembra-hembra). Vienen con el adaptador o se compran aparte.
+3. **Transformador 24VAC** (el que viene con el irrigador).
+4. **Ordenador** con Python 3 instalado.
+
+### Instalar ltchiptool
+
+Abre una terminal (CMD en Windows, Terminal en Mac/Linux) y ejecuta:
+
+```bash
+pip install ltchiptool
+```
+
+Si da error de permisos:
+
+```bash
+pip install --user ltchiptool
+```
+
+### Conexiones (sin soldar)
+
+Conecta los 4 cables dupont así:
 
 ```
   Adaptador USB-TTL          Placa TY-W-8L-AC-DZAK
@@ -38,28 +58,57 @@ El BK7231N se flashea por UART con [ltchiptool](https://github.com/libretiny-eu/
          RX  ◄───────────────────  TX
 ```
 
-**IMPORTANTE**: La placa se alimenta por **24VAC** (su regulador interno genera los 3.3V). El adaptador USB-TTL solo se usa para comunicación, NO para alimentar.
+**Truco**: Los cables se cruzan: TX del adaptador va a RX de la placa, y RX del adaptador va a TX de la placa.
 
-### Proceso
+**IMPORTANTE**: La placa se alimenta por **24VAC** (su transformador). El adaptador USB solo se usa para comunicación, NO para alimentar.
 
-1. **Conecta los 4 cables** dupont (3.3V, GND, TX↔RX cruzados)
-2. **Alimenta la placa** con 24VAC
-3. **Pon en modo descarga**: toca brevemente RST con GND (un par de toques rápidos)
-4. **Lanza el comando** inmediatamente después del reset
+### Proceso de flasheo
 
-### Backup del firmware original (recomendado)
-
-```bash
-ltchiptool flash read bk7231n backup_original.bin
-```
-
-### Flasheo de ESPHome
+1. **Conecta los 4 cables** dupont a la placa (puedes sujetarlos con los dedos, no hace falta soldar).
+2. **Enchufa el transformador 24VAC** a la placa.
+3. **Pon en modo descarga**: con un cable suelto, toca brevemente el pin **RST** con **GND** (un par de toques rápidos). Esto reinicia la placa en modo de programación.
+4. **Inmediatamente después**, ejecuta en la terminal:
 
 ```bash
 ltchiptool flash write bk7231n irrigador-8z-sep.bin
 ```
 
-Una vez flasheado, las actualizaciones son **OTA** (por WiFi, sin cables).
+Si todo va bien, verás una barra de progreso y al final "Flash complete".
+
+### Backup del firmware original (opcional pero recomendado)
+
+Antes de flashear, puedes guardar el firmware original por si quieres volver:
+
+```bash
+ltchiptool flash read bk7231n backup_original.bin
+```
+
+### Después del flasheo
+
+1. **Desenchufa el transformador** y desconecta los cables dupont.
+2. **Vuelve a enchufar el transformador** (solo 24VAC, sin cables USB).
+3. La placa arrancará y creará una **red WiFi abierta** llamada `Irrigador-8Z-SEP Fallback`.
+4. **Conéctate a esa red** con tu móvil/ordenador.
+5. Se abrirá automáticamente una página web (o ve a `http://192.168.4.1`).
+6. **Introduce el nombre y contraseña de tu WiFi** y guarda.
+7. La placa se conectará a tu WiFi. Desde ahora, podrás acceder a ella en `http://irrigador-8z-sep.local` (o por su IP si conoces).
+
+**¡Listo!** Ya puedes controlar el riego desde la web o desde Home Assistant.
+
+## Uso de los botones
+
+- **UP** (flecha arriba): avanza a la zona siguiente
+- **DOWN** (flecha abajo): retrocede a la zona anterior
+- **SET/Círculo**: 
+  - Si usaste las flechas para elegir zona → riega **solo esa zona**
+  - Si no tocaste nada → riega **las 8 zonas en ciclo completo**
+  - Si está regando → **para todo**
+
+Cada vez que pulsas un botón, suena un **pitido** de confirmación.
+
+## Ajustar tiempos de riego
+
+Desde la web (`http://irrigador-8z-sep.local`), cada zona tiene un control deslizante para ajustar la duración (por defecto 5 minutos). El valor se guarda en la placa y no se pierde aunque se vaya la luz.
 
 ## Estado actual
 
@@ -82,7 +131,8 @@ Una vez flasheado, las actualizaciones son **OTA** (por WiFi, sin cables).
 
 | Archivo | Descripción |
 |---------|-------------|
-| `irrigador-8z-sep.yaml` | **Firmware principal** — 2 SR independientes, sprinkler completo, LEDs auto |
+| `irrigador-8z-sep.bin` | **Firmware compilado listo para flashear** (descargar de Releases) |
+| `irrigador-8z-sep.yaml` | Código fuente ESPHome (para quien quiera compilar o modificar) |
 | `irrigador-8z.yaml` | Firmware anterior (2 SR en cascada, no funciona en esta PCB) |
 | `irrigador-8z-diag.yaml` | Firmware de diagnóstico (bits individuales, sweep de pines) |
 | `secrets.yaml.example` | Plantilla de secretos (WiFi, API key, OTA password) |
