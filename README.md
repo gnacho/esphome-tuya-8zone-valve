@@ -123,7 +123,7 @@ From the web (`http://irrigador-8z-sep.local`), each zone has a slider to adjust
 - ✅ Buzzer P14: confirmation beep on button press
 - ✅ Touch buttons functional with smart toggle logic
 - ✅ Irrigation durations persist in flash (adjustable from web without Home Assistant)
-- ⚠️ WiFi LED (P28): under testing
+- ✅ WiFi LED (P28): lit in red
 
 ## Files
 

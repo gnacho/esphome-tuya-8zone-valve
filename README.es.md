@@ -125,7 +125,7 @@ Desde la web (`http://irrigador-8z-sep.local`), cada zona tiene un control desli
   - **DOWN** (P6): zona anterior
   - **SET/Círculo** (P8): toggle inteligente — si se navegó con flechas, riega solo esa zona; si no, ciclo completo de 8 zonas; si está regando, para todo
 - ✅ Tiempos de riego persistentes en flash (ajustables desde web sin Home Assistant)
-- ⚠️ LED WiFi (P28): en pruebas
+- ✅ LED WiFi (P28): encendido en rojo
 
 ## Archivos
 
