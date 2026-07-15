@@ -433,11 +433,6 @@ binary_sensor:
               } else {
                 id(activate_zone)->execute(id(selected_zone));
               }
-            } else {
-              for (size_t i = 0; i < 8; i++) {
-                id(irrigador).enable_switch(i)->turn_on();
-              }
-              id(irrigador).resume_or_start_full_cycle();
             }
 
   # P26: Botón no identificado en PCB actual. Reservado para uso futuro.

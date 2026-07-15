@@ -144,10 +144,6 @@ If you don't press anything for **8 seconds**, the selection is automatically ca
 1. Hold **DOWN** for **4 seconds** until all LEDs blink
 2. Press circle → all zones close (3 confirmation beeps)
 
-### Without prior selection
-
-If you press circle without touching any arrow, all 8 zones activate in full cycle.
-
 ### Notes
 
 - Each button press produces a short confirmation beep

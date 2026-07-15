@@ -143,10 +143,6 @@ Si no pulsas nada durante **8 segundos**, la selección se cancela automáticame
 1. Mantén **DOWN** presionado **4 segundos** hasta que todos los LEDs parpadeen
 2. Pulsa círculo → se cierran todas las zonas (3 pitidos de confirmación)
 
-### Sin selección previa
-
-Si pulsas círculo sin haber tocado ninguna flecha, se activan las 8 zonas en ciclo completo.
-
 ### Notas
 
 - Cada pulsación de botón produce un pitido corto de confirmación
