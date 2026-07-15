@@ -47,6 +47,10 @@ pip install --user ltchiptool
 
 ### Conexiones (sin soldar)
 
+**⚠️ ADVERTENCIA CRÍTICA**: **NUNCA conectes 3.3V del adaptador USB y 24VAC al mismo tiempo**. Puedes dañar la placa.
+
+**Opción A: Solo con 3.3V (preferible si funciona)**
+
 Conecta los 4 cables dupont así:
 
 ```
@@ -60,7 +64,25 @@ Conecta los 4 cables dupont así:
 
 **Truco**: Los cables se cruzan: TX del adaptador va a RX de la placa, y RX del adaptador va a TX de la placa.
 
-**IMPORTANTE**: La placa se alimenta por **24VAC** (su transformador). El adaptador USB solo se usa para comunicación, NO para alimentar.
+Prueba primero así. Si el flasheo funciona, perfecto.
+
+**Opción B: Con 24VAC (si 3.3V no funciona)**
+
+Si la Opción A falla (la placa no responde, timeout, etc.), desconecta el cable de 3.3V y usa el transformador 24VAC:
+
+```
+  Adaptador USB-TTL          Placa TY-W-8L-AC-DZAK
+  ─────────────────          ─────────────────────
+        GND  ───────────────────►  GND
+         TX  ───────────────────►  RX
+         RX  ◄───────────────────  TX
+
+  Transformador 24VAC        Placa TY-W-8L-AC-DZAK
+  ─────────────────          ─────────────────────
+       24VAC ───────────────────►  AC IN (bornas)
+```
+
+**⚠️ IMPORTANTE**: En la Opción B, **NO conectes el cable 3.3V del adaptador USB**. Solo GND, TX y RX. La placa genera sus propios 3.3V internamente desde el 24VAC.
 
 ### Proceso de flasheo
 

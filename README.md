@@ -48,6 +48,10 @@ pip install --user ltchiptool
 
 ### Connections (no soldering)
 
+**⚠️ CRITICAL WARNING**: **NEVER connect 3.3V from USB adapter and 24VAC at the same time**. You can damage the board.
+
+**Option A: 3.3V only (preferable if it works)**
+
 Connect the 4 dupont cables like this:
 
 ```
@@ -61,7 +65,25 @@ Connect the 4 dupont cables like this:
 
 **Tip**: The cables cross: TX from adapter goes to RX on board, and RX from adapter goes to TX on board.
 
-**IMPORTANT**: The board is powered by **24VAC** (its transformer). The USB adapter is only for communication, NOT for power.
+Try this first. If flashing works, great.
+
+**Option B: With 24VAC (if 3.3V doesn't work)**
+
+If Option A fails (board doesn't respond, timeout, etc.), disconnect the 3.3V cable and use the 24VAC transformer:
+
+```
+  USB-TTL Adapter            TY-W-8L-AC-DZAK Board
+  ───────────────            ─────────────────────
+        GND  ───────────────────►  GND
+         TX  ───────────────────►  RX
+         RX  ◄───────────────────  TX
+
+  24VAC Transformer          TY-W-8L-AC-DZAK Board
+  ─────────────────          ─────────────────────
+       24VAC ───────────────────►  AC IN (terminals)
+```
+
+**⚠️ IMPORTANT**: In Option B, **DO NOT connect the 3.3V cable from the USB adapter**. Only GND, TX and RX. The board generates its own 3.3V internally from the 24VAC.
 
 ### Flashing process
 
