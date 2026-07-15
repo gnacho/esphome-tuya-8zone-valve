@@ -1,0 +1,168 @@
+esphome:
+  name: irrigador-8z
+  friendly_name: Irrigador 8Z DIAG
+
+bk72xx:
+  board: cbu
+
+logger:
+  level: DEBUG
+
+api:
+  encryption:
+    key: !secret api_key
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: "Irrigador-8Z Fallback"
+    password: "12345678"
+
+captive_portal:
+web_server:
+  port: 80
+
+sn74hc595:
+  - id: shift_reg
+    data_pin: P6
+    clock_pin: P15
+    latch_pin: P17
+    sr_count: 2
+
+switch:
+  - platform: gpio
+    name: "OE-P8"
+    id: oe_p8
+    restore_mode: ALWAYS_OFF
+    pin:
+      number: P8
+      inverted: true
+
+  - platform: gpio
+    name: "OE-P9"
+    id: oe_p9
+    restore_mode: ALWAYS_OFF
+    pin:
+      number: P9
+      inverted: true
+
+  - platform: gpio
+    name: "OE-P10"
+    id: oe_p10
+    restore_mode: ALWAYS_OFF
+    pin:
+      number: P10
+      inverted: true
+
+  - platform: gpio
+    name: "OE-P11"
+    id: oe_p11
+    restore_mode: ALWAYS_OFF
+    pin:
+      number: P11
+      inverted: true
+
+  - platform: gpio
+    name: "OE-P14"
+    id: oe_p14
+    restore_mode: ALWAYS_OFF
+    pin:
+      number: P14
+      inverted: true
+
+  - platform: gpio
+    name: "BIT0 (zona1)"
+    id: bit_0
+    restore_mode: ALWAYS_OFF
+    pin:
+      sn74hc595: shift_reg
+      number: 0
+      inverted: false
+
+  - platform: gpio
+    name: "BIT1 (zona2)"
+    id: bit_1
+    restore_mode: ALWAYS_OFF
+    pin:
+      sn74hc595: shift_reg
+      number: 1
+      inverted: false
+
+  - platform: gpio
+    name: "BIT8 (led1)"
+    id: bit_8
+    restore_mode: ALWAYS_OFF
+    pin:
+      sn74hc595: shift_reg
+      number: 8
+      inverted: true
+
+  - platform: gpio
+    name: "BIT9 (led2)"
+    id: bit_9
+    restore_mode: ALWAYS_OFF
+    pin:
+      sn74hc595: shift_reg
+      number: 9
+      inverted: true
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: P0
+      mode: INPUT_PULLUP
+      inverted: true
+    name: "PIN P0"
+  - platform: gpio
+    pin:
+      number: P1
+      mode: INPUT_PULLUP
+      inverted: true
+    name: "PIN P1"
+  - platform: gpio
+    pin:
+      number: P7
+      mode: INPUT_PULLUP
+      inverted: true
+    name: "PIN P7"
+  - platform: gpio
+    pin:
+      number: P20
+      mode: INPUT_PULLUP
+      inverted: true
+    name: "PIN P20"
+  - platform: gpio
+    pin:
+      number: P21
+      mode: INPUT_PULLUP
+      inverted: true
+    name: "PIN P21"
+  - platform: gpio
+    pin:
+      number: P22
+      mode: INPUT_PULLUP
+      inverted: true
+    name: "PIN P22"
+  - platform: gpio
+    pin:
+      number: P23
+      mode: INPUT_PULLUP
+      inverted: true
+    name: "PIN P23"
+  - platform: gpio
+    pin:
+      number: P24
+      mode: INPUT_PULLUP
+      inverted: true
+    name: "PIN P24"
+  - platform: gpio
+    pin:
+      number: P26
+      mode: INPUT_PULLUP
+      inverted: true
+    name: "PIN P26"
