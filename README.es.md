@@ -14,18 +14,14 @@ Así que decidí ir más allá: **flashear ESPHome** y tener control total, loca
 
 - **SoC**: Beken BK7231N (módulo CBU) — NO es un ESP32
 - **PCB**: TY-W-8L-AC-DZAK rev 24.9.19
-- **Shift registers**: 2x 74HC595 en cascada (16 salidas)
-  - Primer chip (bits 0-7): 8 triacs BT134 → bornas Z1..Z8 (válvulas de riego)
-  - Segundo chip (bits 8-15): 8 LEDs de estado D1..D8
-- **Pines confirmados del shift register**:
-  - P6 = data (SER)
-  - P15 = clock (SRCLK)
-  - P17 = latch (RCLK)
-  - P8 = Output Enable (OE, activo en LOW)
+- **Shift registers**: 2x 74HC595 **independientes** (no en cascada)
+  - **SR de LEDs** (U2): data P9, clock P15, latch P17 → 8 LEDs de estado D1..D8
+  - **SR de válvulas** (U3): data P16, clock P22, latch P20 → 8 triacs BT134 → bornas Z1..Z8
 - **Buzzer**: P14
 - **LED WiFi**: P28
 - **Alimentación**: 24 VAC
-- **Botones físicos**: SET, UP, DOWN (pines por identificar)
+- **Botones táctiles**: P6, P7, P8, P26 (anterior/next/start/stop)
+- **Sensor de lluvia**: P14 (entrada, para sensor externo)
 
 ## El flasheo
 
@@ -40,32 +36,23 @@ Una vez flasheado, las actualizaciones son **OTA** (por WiFi, sin cables).
 
 ## Estado actual
 
-El firmware ESPHome funciona: WiFi conectado, web UI accesible, API de Home Assistant operativa, OTA funcionando. Las 8 zonas de riego se controlan correctamente vía shift registers.
+**¡FUNCIONA!** Las 8 válvulas y los 8 LEDs operan correctamente con la topología de 2 shift registers independientes.
 
-**En progreso** (método ensayo-error, sin ser ingeniero electrónico):
-
-- Identificar los pines exactos de los 3 botones físicos (SET, UP, DOWN)
-- Verificar el mapeo correcto de LEDs a zonas
-- Ajustar lógica invertida donde sea necesario
-
-## Hoja de ruta
-
-La idea es aprovechar al máximo el [componente Sprinkler de ESPHome](https://esphome.io/components/sprinkler/) — programación, solapamiento de válvulas, avance automático, riego inverso, control de bomba y más.
-
-Pero primero lo primero: **hacer funcionar completamente el hardware**. Antes de añadir funcionalidades avanzadas, necesitamos:
-
-1. Identificar los pines GPIO exactos de los 3 botones físicos (SET, UP, DOWN)
-2. Verificar el mapeo correcto de LEDs a zonas
-3. Confirmar la lógica invertida de triacs y LEDs
-4. Hacer funcionar el buzzer como feedback
-
-Una vez la base sea sólida, el componente sprinkler nos dará un controlador de riego completo de serie.
+- ✅ WiFi conectado, web UI accesible, API de Home Assistant operativa
+- ✅ OTA funcionando (actualizaciones inalámbricas)
+- ✅ 8 válvulas controladas individualmente
+- ✅ 8 LEDs sincronizados con sus válvulas (encienden al abrir)
+- ✅ Componente Sprinkler activo (programación, duraciones, auto-avance)
+- ✅ Botones táctiles: anterior/siguiente/iniciar/parar
+- ⚠️ LED WiFi (P28): en pruebas
+- ⚠️ Sensor de lluvia (P14): sin sensor físico conectado
 
 ## Archivos
 
 | Archivo | Descripción |
 |---------|-------------|
-| `irrigador-8z.yaml` | Firmware principal con sprinkler (8 zonas, duraciones ajustables) |
+| `irrigador-8z-sep.yaml` | **Firmware principal** — 2 SR independientes, sprinkler completo, LEDs auto |
+| `irrigador-8z.yaml` | Firmware anterior (2 SR en cascada, no funciona en esta PCB) |
 | `irrigador-8z-diag.yaml` | Firmware de diagnóstico (bits individuales, sweep de pines) |
 | `secrets.yaml.example` | Plantilla de secretos (WiFi, API key, OTA password) |
 
