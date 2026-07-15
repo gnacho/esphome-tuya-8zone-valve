@@ -1,3 +1,4 @@
+<img width="960" height="960" alt="tcsepzt9qcdh1" src="https://github.com/user-attachments/assets/f7352d06-76f5-4397-9b43-53ddc21dea8f" />
 # 8-Zone Tuya Irrigation Controller → ESPHome
 
 *[Versión en español](README.es.md)*
