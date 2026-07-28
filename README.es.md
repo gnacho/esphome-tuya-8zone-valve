@@ -84,7 +84,17 @@ Si la Opción A falla (la placa no responde, timeout, etc.), desconecta el cable
 
 **⚠️ IMPORTANTE**: En la Opción B, **NO conectes el cable 3.3V del adaptador USB**. Solo GND, TX y RX. La placa genera sus propios 3.3V internamente desde el 24VAC.
 
-### Proceso de flasheo
+### Paso 1: Backup del firmware original (recomendado)
+
+Antes de flashear nada, guarda el firmware de fábrica por si algún día quieres volver atrás:
+
+```bash
+ltchiptool flash read bk7231n backup_original.bin
+```
+
+Usa el mismo cableado y modo descarga que el flasheo (ver abajo), así que merece la pena hacerlo ya que estás conectado.
+
+### Paso 2: Flashear ESPHome
 
 1. **Conecta los 4 cables** dupont a la placa (puedes sujetarlos con los dedos, no hace falta soldar).
 2. **Enchufa el transformador 24VAC** a la placa.
@@ -97,14 +107,6 @@ ltchiptool flash write bk7231n irrigador-8z-sep.bin
 
 Si todo va bien, verás una barra de progreso y al final "Flash complete".
 
-### Backup del firmware original (opcional pero recomendado)
-
-Antes de flashear, puedes guardar el firmware original por si quieres volver:
-
-```bash
-ltchiptool flash read bk7231n backup_original.bin
-```
-
 ### Después del flasheo
 
 1. **Desenchufa el transformador** y desconecta los cables dupont.
@@ -116,6 +118,14 @@ ltchiptool flash read bk7231n backup_original.bin
 7. La placa se conectará a tu WiFi. Desde ahora, podrás acceder a ella en `http://irrigador-8z-sep.local` (o por su IP si conoces).
 
 **¡Listo!** Ya puedes controlar el riego desde la web o desde Home Assistant.
+
+### Servidor web integrado
+
+El firmware incluye un **servidor web** sin contraseña. Entra en `http://irrigador-8z-sep.local` para ver la configuración por defecto nada más arrancar: los 8 interruptores de zona, los deslizadores de duración de riego (5 min por zona por defecto), los controles del controlador de riego (inicio/parada, auto-avance) y los logs en vivo. Todo funciona de forma autónoma — Home Assistant es opcional.
+
+### Actualizaciones OTA (tras el primer flasheo)
+
+El cableado USB-TTL solo hace falta **una vez**. Después del primer flasheo, todas las actualizaciones de firmware se hacen **por OTA** vía WiFi: edita `irrigador-8z-sep.yaml` si quieres y ejecuta `esphome run irrigador-8z-sep.yaml` (o usa el dashboard de ESPHome). No hace falta abrir la caja ni tocar RST/GND otra vez.
 
 ## Uso de los botones
 

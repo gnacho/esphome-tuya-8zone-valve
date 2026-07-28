@@ -85,7 +85,17 @@ If Option A fails (board doesn't respond, timeout, etc.), disconnect the 3.3V ca
 
 **⚠️ IMPORTANT**: In Option B, **DO NOT connect the 3.3V cable from the USB adapter**. Only GND, TX and RX. The board generates its own 3.3V internally from the 24VAC.
 
-### Flashing process
+### Step 1: Back up the original firmware (recommended)
+
+Before flashing anything, save the stock firmware so you can revert if you ever want to go back:
+
+```bash
+ltchiptool flash read bk7231n backup_original.bin
+```
+
+This uses the same wiring and download mode as flashing (see below), so it's worth doing while you're already connected.
+
+### Step 2: Flash ESPHome
 
 1. **Connect the 4 dupont cables** to the board (you can hold them with your fingers, no soldering needed).
 2. **Plug in the 24VAC transformer** to the board.
@@ -98,14 +108,6 @@ ltchiptool flash write bk7231n irrigador-8z-sep.bin
 
 If everything goes well, you'll see a progress bar and at the end "Flash complete".
 
-### Backup original firmware (optional but recommended)
-
-Before flashing, you can save the original firmware in case you want to revert:
-
-```bash
-ltchiptool flash read bk7231n backup_original.bin
-```
-
 ### After flashing
 
 1. **Unplug the transformer** and disconnect the dupont cables.
@@ -117,6 +119,14 @@ ltchiptool flash read bk7231n backup_original.bin
 7. The board will connect to your WiFi. From now on, you can access it at `http://irrigador-8z-sep.local` (or by its IP if you know it).
 
 **Done!** You can now control irrigation from the web or from Home Assistant.
+
+### Built-in web server
+
+The firmware includes a **web server** with no password. Browse to `http://irrigador-8z-sep.local` to see the full default configuration out of the box: the 8 zone switches, the irrigation duration sliders (5 min per zone by default), the sprinkler controller controls (start/stop, auto-advance) and the live logs. Everything works standalone — Home Assistant is optional.
+
+### OTA updates (after the first flash)
+
+The USB-TTL wiring is only needed **once**. After the first flash, all future firmware updates are done **over the air (OTA)** over WiFi: edit `irrigador-8z-sep.yaml` if you want, then run `esphome run irrigador-8z-sep.yaml` (or use the ESPHome dashboard). No need to open the case or touch RST/GND again.
 
 ## Using the buttons
 
