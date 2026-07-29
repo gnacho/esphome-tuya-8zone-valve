@@ -1,6 +1,6 @@
 esphome:
-  name: irrigador-8z-sep
-  friendly_name: Irrigador 8Z SEP
+  name: sprinkler-8z
+  friendly_name: 8-Zone Sprinkler
   on_boot:
     priority: 800
     then:
@@ -40,7 +40,7 @@ wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
   ap:
-    ssid: "Irrigador-8Z-SEP Fallback"
+    ssid: "Sprinkler-8Z Fallback"
     password: "12345678"
 
 captive_portal:
@@ -120,7 +120,7 @@ output:
 switch:
   - platform: gpio
     id: valve_1
-    name: "Válvula 1"
+    name: "Valve 1"
     pin:
       sn74hc595: valve_sn74hc595
       number: 0
@@ -133,7 +133,7 @@ switch:
         - lambda: if (id(selected_zone) != 1) id(led_1)->turn_off();
   - platform: gpio
     id: valve_2
-    name: "Válvula 2"
+    name: "Valve 2"
     pin:
       sn74hc595: valve_sn74hc595
       number: 1
@@ -146,7 +146,7 @@ switch:
         - lambda: if (id(selected_zone) != 2) id(led_2)->turn_off();
   - platform: gpio
     id: valve_3
-    name: "Válvula 3"
+    name: "Valve 3"
     pin:
       sn74hc595: valve_sn74hc595
       number: 2
@@ -159,7 +159,7 @@ switch:
         - lambda: if (id(selected_zone) != 3) id(led_3)->turn_off();
   - platform: gpio
     id: valve_4
-    name: "Válvula 4"
+    name: "Valve 4"
     pin:
       sn74hc595: valve_sn74hc595
       number: 3
@@ -172,7 +172,7 @@ switch:
         - lambda: if (id(selected_zone) != 4) id(led_4)->turn_off();
   - platform: gpio
     id: valve_5
-    name: "Válvula 5"
+    name: "Valve 5"
     pin:
       sn74hc595: valve_sn74hc595
       number: 4
@@ -185,7 +185,7 @@ switch:
         - lambda: if (id(selected_zone) != 5) id(led_5)->turn_off();
   - platform: gpio
     id: valve_6
-    name: "Válvula 6"
+    name: "Valve 6"
     pin:
       sn74hc595: valve_sn74hc595
       number: 5
@@ -198,7 +198,7 @@ switch:
         - lambda: if (id(selected_zone) != 6) id(led_6)->turn_off();
   - platform: gpio
     id: valve_7
-    name: "Válvula 7"
+    name: "Valve 7"
     pin:
       sn74hc595: valve_sn74hc595
       number: 6
@@ -211,7 +211,7 @@ switch:
         - lambda: if (id(selected_zone) != 7) id(led_7)->turn_off();
   - platform: gpio
     id: valve_8
-    name: "Válvula 8"
+    name: "Valve 8"
     pin:
       sn74hc595: valve_sn74hc595
       number: 7
@@ -254,7 +254,7 @@ interval:
                 if (blink_state) led->turn_on();
                 else led->turn_off();
               } else {
-                auto valve_id = id(irrigador).valve_switch(i);
+                auto valve_id = id(sprinkler_controller).valve_switch(i);
                 if (valve_id != nullptr && valve_id->state) {
                   led->turn_on();
                 } else {
@@ -296,7 +296,7 @@ script:
           auto leds = {id(led_1), id(led_2), id(led_3), id(led_4), id(led_5), id(led_6), id(led_7), id(led_8)};
           int i = 0;
           for (auto led : leds) {
-            auto valve_id = id(irrigador).valve_switch(i);
+            auto valve_id = id(sprinkler_controller).valve_switch(i);
             if (valve_id != nullptr && valve_id->state) {
               led->turn_on();
             } else {
@@ -312,12 +312,12 @@ script:
       - lambda: |
           for (size_t i = 0; i < 8; i++) {
             if (i == zone) {
-              id(irrigador).enable_switch(i)->turn_on();
+              id(sprinkler_controller).enable_switch(i)->turn_on();
             } else {
-              id(irrigador).enable_switch(i)->turn_off();
+              id(sprinkler_controller).enable_switch(i)->turn_off();
             }
           }
-          id(irrigador).resume_or_start_full_cycle();
+          id(sprinkler_controller).resume_or_start_full_cycle();
           id(selected_zone) = -1;
           id(all_zones_mode) = 0;
 
@@ -325,16 +325,16 @@ script:
     then:
       - lambda: |
           for (size_t i = 0; i < 8; i++) {
-            id(irrigador).enable_switch(i)->turn_on();
+            id(sprinkler_controller).enable_switch(i)->turn_on();
           }
-          id(irrigador).resume_or_start_full_cycle();
+          id(sprinkler_controller).resume_or_start_full_cycle();
           id(all_zones_mode) = 0;
           id(selected_zone) = -1;
 
   - id: stop_all_zones
     then:
       - lambda: |
-          id(irrigador).shutdown();
+          id(sprinkler_controller).shutdown();
           id(all_zones_mode) = 0;
           id(selected_zone) = -1;
 
@@ -343,7 +343,7 @@ binary_sensor:
     pin:
       number: P6
       inverted: true
-    name: "Botón UP (P6)"
+    name: "UP Button (P6)"
     internal: true
     on_multi_click:
       - timing:
@@ -365,7 +365,7 @@ binary_sensor:
           - lambda: |
               int current = id(selected_zone);
               if (current < 0) {
-                auto av = id(irrigador).active_valve();
+                auto av = id(sprinkler_controller).active_valve();
                 current = av.has_value() ? av.value() : -1;
               }
               int next = (current + 1) % 8;
@@ -377,7 +377,7 @@ binary_sensor:
     pin:
       number: P7
       inverted: true
-    name: "Botón DOWN (P7)"
+    name: "DOWN Button (P7)"
     internal: true
     on_multi_click:
       - timing:
@@ -399,7 +399,7 @@ binary_sensor:
           - lambda: |
               int current = id(selected_zone);
               if (current < 0) {
-                auto av = id(irrigador).active_valve();
+                auto av = id(sprinkler_controller).active_valve();
                 current = av.has_value() ? av.value() : 8;
               }
               int prev = (current + 7) % 8;
@@ -411,7 +411,7 @@ binary_sensor:
     pin:
       number: P8
       inverted: true
-    name: "Botón SET (P8)"
+    name: "SET Button (P8)"
     internal: true
     on_press:
       then:
@@ -426,82 +426,82 @@ binary_sensor:
               id(stop_all_zones)->execute();
               id(beep_3_times)->execute();
             } else if (id(selected_zone) >= 0) {
-              auto current = id(irrigador).active_valve();
+              auto current = id(sprinkler_controller).active_valve();
               if (current.has_value() && current.value() == id(selected_zone)) {
-                id(irrigador).shutdown();
+                id(sprinkler_controller).shutdown();
                 id(selected_zone) = -1;
               } else {
                 id(activate_zone)->execute(id(selected_zone));
               }
             }
 
-  # P26: Botón no identificado en PCB actual. Reservado para uso futuro.
+  # P26: button not present on the current PCB. Reserved for future use.
   # - platform: gpio
   #   pin:
   #     number: P26
   #     inverted: true
-  #   name: "Botón P26 (reservado)"
+  #   name: "P26 Button (reserved)"
   #   internal: true
 
 sprinkler:
-  - id: irrigador
-    main_switch: "Riego"
-    auto_advance_switch: "Auto Avance"
+  - id: sprinkler_controller
+    main_switch: "Irrigation"
+    auto_advance_switch: "Auto Advance"
     valve_overlap: 5s
     valves:
-      - valve_switch: "Zona 1"
-        enable_switch: "Habilitar Zona 1"
+      - valve_switch: "Zone 1"
+        enable_switch: "Enable Zone 1"
         run_duration_number:
-          name: "Duración Zona 1"
+          name: "Zone 1 Duration"
           initial_value: 5
           unit_of_measurement: min
         valve_switch_id: valve_1
-      - valve_switch: "Zona 2"
-        enable_switch: "Habilitar Zona 2"
+      - valve_switch: "Zone 2"
+        enable_switch: "Enable Zone 2"
         run_duration_number:
-          name: "Duración Zona 2"
+          name: "Zone 2 Duration"
           initial_value: 5
           unit_of_measurement: min
         valve_switch_id: valve_2
-      - valve_switch: "Zona 3"
-        enable_switch: "Habilitar Zona 3"
+      - valve_switch: "Zone 3"
+        enable_switch: "Enable Zone 3"
         run_duration_number:
-          name: "Duración Zona 3"
+          name: "Zone 3 Duration"
           initial_value: 5
           unit_of_measurement: min
         valve_switch_id: valve_3
-      - valve_switch: "Zona 4"
-        enable_switch: "Habilitar Zona 4"
+      - valve_switch: "Zone 4"
+        enable_switch: "Enable Zone 4"
         run_duration_number:
-          name: "Duración Zona 4"
+          name: "Zone 4 Duration"
           initial_value: 5
           unit_of_measurement: min
         valve_switch_id: valve_4
-      - valve_switch: "Zona 5"
-        enable_switch: "Habilitar Zona 5"
+      - valve_switch: "Zone 5"
+        enable_switch: "Enable Zone 5"
         run_duration_number:
-          name: "Duración Zona 5"
+          name: "Zone 5 Duration"
           initial_value: 5
           unit_of_measurement: min
         valve_switch_id: valve_5
-      - valve_switch: "Zona 6"
-        enable_switch: "Habilitar Zona 6"
+      - valve_switch: "Zone 6"
+        enable_switch: "Enable Zone 6"
         run_duration_number:
-          name: "Duración Zona 6"
+          name: "Zone 6 Duration"
           initial_value: 5
           unit_of_measurement: min
         valve_switch_id: valve_6
-      - valve_switch: "Zona 7"
-        enable_switch: "Habilitar Zona 7"
+      - valve_switch: "Zone 7"
+        enable_switch: "Enable Zone 7"
         run_duration_number:
-          name: "Duración Zona 7"
+          name: "Zone 7 Duration"
           initial_value: 5
           unit_of_measurement: min
         valve_switch_id: valve_7
-      - valve_switch: "Zona 8"
-        enable_switch: "Habilitar Zona 8"
+      - valve_switch: "Zone 8"
+        enable_switch: "Enable Zone 8"
         run_duration_number:
-          name: "Duración Zona 8"
+          name: "Zone 8 Duration"
           initial_value: 5
           unit_of_measurement: min
         valve_switch_id: valve_8
