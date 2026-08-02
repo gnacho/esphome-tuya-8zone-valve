@@ -102,8 +102,10 @@ Usa el mismo cableado y modo descarga que el flasheo (ver abajo), así que merec
 4. **Inmediatamente después**, ejecuta en la terminal:
 
 ```bash
-ltchiptool flash write bk7231n irrigador-8z-sep.bin
+ltchiptool flash write bk7231n sprinkler-8z.bin
 ```
+
+(Descarga `sprinkler-8z.bin` de [Releases](https://github.com/gnacho/esphome-tuya-8zone-valve/releases), o compila tú mismo `sprinkler-8z.yaml` con ESPHome.)
 
 Si todo va bien, verás una barra de progreso y al final "Flash complete".
 
@@ -111,21 +113,21 @@ Si todo va bien, verás una barra de progreso y al final "Flash complete".
 
 1. **Desenchufa el transformador** y desconecta los cables dupont.
 2. **Vuelve a enchufar el transformador** (solo 24VAC, sin cables USB).
-3. La placa arrancará y creará una **red WiFi abierta** llamada `Irrigador-8Z-SEP Fallback`.
+3. La placa arrancará y creará una red WiFi llamada `Sprinkler-8Z Fallback` (contraseña: `12345678`).
 4. **Conéctate a esa red** con tu móvil/ordenador.
 5. Se abrirá automáticamente una página web (o ve a `http://192.168.4.1`).
 6. **Introduce el nombre y contraseña de tu WiFi** y guarda.
-7. La placa se conectará a tu WiFi. Desde ahora, podrás acceder a ella en `http://irrigador-8z-sep.local` (o por su IP si conoces).
+7. La placa se conectará a tu WiFi. Desde ahora, podrás acceder a ella en `http://sprinkler-8z.local` (o por su IP si conoces).
 
 **¡Listo!** Ya puedes controlar el riego desde la web o desde Home Assistant.
 
 ### Servidor web integrado
 
-El firmware incluye un **servidor web** sin contraseña. Entra en `http://irrigador-8z-sep.local` para ver la configuración por defecto nada más arrancar: los 8 interruptores de zona, los deslizadores de duración de riego (5 min por zona por defecto), los controles del controlador de riego (inicio/parada, auto-avance) y los logs en vivo. Todo funciona de forma autónoma — Home Assistant es opcional.
+El firmware incluye un **servidor web** sin contraseña. Entra en `http://sprinkler-8z.local` para ver la configuración por defecto nada más arrancar: los 8 interruptores de zona, los deslizadores de duración de riego (5 min por zona por defecto), los controles del controlador de riego (inicio/parada, auto-avance) y los logs en vivo. Todo funciona de forma autónoma — Home Assistant es opcional.
 
 ### Actualizaciones OTA (tras el primer flasheo)
 
-El cableado USB-TTL solo hace falta **una vez**. Después del primer flasheo, todas las actualizaciones de firmware se hacen **por OTA** vía WiFi: edita `irrigador-8z-sep.yaml` si quieres y ejecuta `esphome run irrigador-8z-sep.yaml` (o usa el dashboard de ESPHome). No hace falta abrir la caja ni tocar RST/GND otra vez.
+El cableado USB-TTL solo hace falta **una vez**. Después del primer flasheo, todas las actualizaciones de firmware se hacen **por OTA** vía WiFi: edita `sprinkler-8z.yaml` si quieres y ejecuta `esphome run sprinkler-8z.yaml` (o usa el dashboard de ESPHome). No hace falta abrir la caja ni tocar RST/GND otra vez.
 
 ## Uso de los botones
 
@@ -162,7 +164,7 @@ Si no pulsas nada durante **8 segundos**, la selección se cancela automáticame
 
 ## Ajustar tiempos de riego
 
-Desde la web (`http://irrigador-8z-sep.local`), cada zona tiene un control deslizante para ajustar la duración (por defecto 5 minutos). El valor se guarda en la placa y no se pierde aunque se vaya la luz.
+Desde la web (`http://sprinkler-8z.local`), cada zona tiene un control deslizante para ajustar la duración (por defecto 5 minutos). El valor se guarda en la placa y no se pierde aunque se vaya la luz.
 
 ## Estado actual
 
@@ -185,11 +187,11 @@ Desde la web (`http://irrigador-8z-sep.local`), cada zona tiene un control desli
 
 | Archivo | Descripción |
 |---------|-------------|
-| `irrigador-8z-sep.bin` | **Firmware compilado listo para flashear** (descargar de Releases) |
-| `irrigador-8z-sep.yaml` | Código fuente ESPHome (para quien quiera compilar o modificar) |
-| `irrigador-8z.yaml` | Firmware anterior (2 SR en cascada, no funciona en esta PCB) |
-| `irrigador-8z-diag.yaml` | Firmware de diagnóstico (bits individuales, sweep de pines) |
+| `sprinkler-8z.yaml` | Código fuente ESPHome (compílalo o modifícalo a tu gusto) |
+| `sprinkler-8z.bin` | **Firmware compilado listo para flashear** (descargar de [Releases](https://github.com/gnacho/esphome-tuya-8zone-valve/releases)) |
 | `secrets.yaml.example` | Plantilla de secretos (WiFi, API key, OTA password) |
+
+*Las configs antiguas con nombre en español (`irrigador-8z*.yaml`) se eliminaron en v1.2.0 — `sprinkler-8z.yaml` es la traducción directa al inglés del antiguo `irrigador-8z-sep.yaml`, idéntica en funcionalidad.*
 
 ## Requisitos
 
