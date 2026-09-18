@@ -21,13 +21,14 @@ Así que decidí ir más allá: **flashear ESPHome** y tener control total, loca
 - **LED WiFi**: P28
 - **Alimentación**: 24 VAC (transformador externo)
 - **Botones táctiles**: UP (P7), DOWN (P6), SET/Círculo (P8)
+- **Variante 6 zonas**: PCB TY-W-6L-AC-DZAK, misma familia BK7231N/CBU. El procedimiento de flasheo de abajo es el mismo.
 
 ## Cómo flashear (paso a paso)
 
 ### Qué necesitas
 
 1. **Adaptador USB-TTL 3.3V** (también llamado "adaptador serial USB" o "CP2102/CH340/FT232"). Cuesta ~3-5€ en AliExpress o Amazon. **IMPORTANTE**: debe ser de **3.3V**, NO de 5V (puedes freír la placa).
-2. **4 cables dupont** (cables con conectores hembra-hembra). Vienen con el adaptador o se compran aparte.
+2. **3 cables dupont** (cables con conectores hembra-hembra), más 1 cable suelto para el truco del reset de abajo. Vienen con el adaptador o se compran aparte.
 3. **Transformador 24VAC** (el que viene con el irrigador).
 4. **Ordenador** con Python 3 instalado.
 
@@ -49,40 +50,27 @@ pip install --user ltchiptool
 
 **⚠️ ADVERTENCIA CRÍTICA**: **NUNCA conectes 3.3V del adaptador USB y 24VAC al mismo tiempo**. Puedes dañar la placa.
 
-**Opción A: Solo con 3.3V (preferible si funciona)**
+**Alimenta la placa con su propio transformador 24VAC. No uses el VCC del adaptador.**
 
-Conecta los 4 cables dupont así:
+No conseguimos que la placa funcione alimentándola desde el pin 3.3V (VCC) del adaptador: el chip no se mantiene activo y **ni el backup del firmware ni el flasheo llegan a completarse** (probado en la unidad de 6 zonas TY-W-6L). La placa tiene que estar alimentada externamente con el transformador 24VAC durante toda la operación.
 
-```
-  Adaptador USB-TTL          Placa TY-W-8L-AC-DZAK
-  ─────────────────          ─────────────────────
-       3.3V  ───────────────────►  3.3V
-        GND  ───────────────────►  GND
-         TX  ───────────────────►  RX
-         RX  ◄───────────────────  TX
-```
-
-**Truco**: Los cables se cruzan: TX del adaptador va a RX de la placa, y RX del adaptador va a TX de la placa.
-
-Prueba primero así. Si el flasheo funciona, perfecto.
-
-**Opción B: Con 24VAC (si 3.3V no funciona)**
-
-Si la Opción A falla (la placa no responde, timeout, etc.), desconecta el cable de 3.3V y usa el transformador 24VAC:
+Conecta así:
 
 ```
-  Adaptador USB-TTL          Placa TY-W-8L-AC-DZAK
-  ─────────────────          ─────────────────────
+  Adaptador USB-TTL          Placa (TY-W-8L / TY-W-6L)
+  ─────────────────          ─────────────────────────
         GND  ───────────────────►  GND
          TX  ───────────────────►  RX
          RX  ◄───────────────────  TX
 
-  Transformador 24VAC        Placa TY-W-8L-AC-DZAK
-  ─────────────────          ─────────────────────
+  Transformador 24VAC        Placa (TY-W-8L / TY-W-6L)
+  ─────────────────          ─────────────────────────
        24VAC ───────────────────►  AC IN (bornas)
 ```
 
-**⚠️ IMPORTANTE**: En la Opción B, **NO conectes el cable 3.3V del adaptador USB**. Solo GND, TX y RX. La placa genera sus propios 3.3V internamente desde el 24VAC.
+**⚠️ IMPORTANTE**: Solo 3 cables desde el adaptador USB: GND, TX y RX. **No conectes el cable 3.3V del adaptador**. La placa genera sus propios 3.3V internamente desde el 24VAC.
+
+**Truco**: Los cables se cruzan: TX del adaptador va a RX de la placa, y RX del adaptador va a TX de la placa.
 
 ### Paso 1: Backup del firmware original (recomendado)
 
@@ -96,7 +84,7 @@ Usa el mismo cableado y modo descarga que el flasheo (ver abajo), así que merec
 
 ### Paso 2: Flashear ESPHome
 
-1. **Conecta los 4 cables** dupont a la placa (puedes sujetarlos con los dedos, no hace falta soldar).
+1. **Conecta los 3 cables** dupont a la placa (puedes sujetarlos con los dedos, no hace falta soldar).
 2. **Enchufa el transformador 24VAC** a la placa.
 3. **Pon en modo descarga**: con un cable suelto, toca brevemente el pin **RST** con **GND** (un par de toques rápidos). Esto reinicia la placa en modo de programación.
 4. **Inmediatamente después**, ejecuta en la terminal:

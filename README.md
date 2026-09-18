@@ -22,13 +22,14 @@ So I decided to go further: **flash ESPHome** and have total, local control with
 - **WiFi LED**: P28
 - **Power**: 24 VAC (external transformer)
 - **Touch buttons**: UP (P7), DOWN (P6), SET/Circle (P8)
+- **6-zone variant**: PCB TY-W-6L-AC-DZAK, same BK7231N/CBU family. The flashing procedure below is the same.
 
 ## How to flash (step by step)
 
 ### What you need
 
 1. **3.3V USB-TTL adapter** (also called "USB serial adapter" or "CP2102/CH340/FT232"). Costs ~$3-5 on AliExpress or Amazon. **IMPORTANT**: must be **3.3V**, NOT 5V (you can fry the board).
-2. **4 dupont cables** (female-female jumper wires). Usually come with the adapter or can be bought separately.
+2. **3 dupont cables** (female-female jumper wires), plus 1 loose wire for the reset trick below. Usually come with the adapter or can be bought separately.
 3. **24VAC transformer** (the one that comes with the irrigator).
 4. **Computer** with Python 3 installed.
 
@@ -48,42 +49,29 @@ pip install --user ltchiptool
 
 ### Connections (no soldering)
 
-**⚠️ CRITICAL WARNING**: **NEVER connect 3.3V from USB adapter and 24VAC at the same time**. You can damage the board.
+**⚠️ CRITICAL WARNING**: **NEVER connect 3.3V from the USB adapter and 24VAC at the same time**. You can damage the board.
 
-**Option A: 3.3V only (preferable if it works)**
+**Power the board with its own 24VAC transformer. Do not use the adapter's VCC.**
 
-Connect the 4 dupont cables like this:
+We could not get the board to work powered from the adapter's 3.3V (VCC) pin: the chip does not stay up and **neither the firmware backup nor the flash completes** (tested on the 6-zone TY-W-6L unit). The board must be externally powered with the 24VAC transformer during the whole operation.
 
-```
-  USB-TTL Adapter            TY-W-8L-AC-DZAK Board
-  ───────────────            ─────────────────────
-       3.3V  ───────────────────►  3.3V
-        GND  ───────────────────►  GND
-         TX  ───────────────────►  RX
-         RX  ◄───────────────────  TX
-```
-
-**Tip**: The cables cross: TX from adapter goes to RX on board, and RX from adapter goes to TX on board.
-
-Try this first. If flashing works, great.
-
-**Option B: With 24VAC (if 3.3V doesn't work)**
-
-If Option A fails (board doesn't respond, timeout, etc.), disconnect the 3.3V cable and use the 24VAC transformer:
+Connect like this:
 
 ```
-  USB-TTL Adapter            TY-W-8L-AC-DZAK Board
-  ───────────────            ─────────────────────
+  USB-TTL Adapter            Board (TY-W-8L / TY-W-6L)
+  ───────────────            ────────────────────────
         GND  ───────────────────►  GND
          TX  ───────────────────►  RX
          RX  ◄───────────────────  TX
 
-  24VAC Transformer          TY-W-8L-AC-DZAK Board
-  ─────────────────          ─────────────────────
+  24VAC Transformer          Board (TY-W-8L / TY-W-6L)
+  ─────────────────          ────────────────────────
        24VAC ───────────────────►  AC IN (terminals)
 ```
 
-**⚠️ IMPORTANT**: In Option B, **DO NOT connect the 3.3V cable from the USB adapter**. Only GND, TX and RX. The board generates its own 3.3V internally from the 24VAC.
+**⚠️ IMPORTANT**: Only 3 wires from the USB adapter: GND, TX and RX. **Do not connect the adapter's 3.3V cable**. The board generates its own 3.3V internally from the 24VAC.
+
+**Tip**: The cables cross: TX from the adapter goes to RX on the board, and RX from the adapter goes to TX on the board.
 
 ### Step 1: Back up the original firmware (recommended)
 
@@ -97,7 +85,7 @@ This uses the same wiring and download mode as flashing (see below), so it's wor
 
 ### Step 2: Flash ESPHome
 
-1. **Connect the 4 dupont cables** to the board (you can hold them with your fingers, no soldering needed).
+1. **Connect the 3 dupont cables** to the board (you can hold them with your fingers, no soldering needed).
 2. **Plug in the 24VAC transformer** to the board.
 3. **Enter download mode**: with a loose wire, briefly touch the **RST** pin to **GND** (a couple of quick taps). This restarts the board in programming mode.
 4. **Immediately after**, run in the terminal:
