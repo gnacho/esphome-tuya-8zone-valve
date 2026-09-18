@@ -94,7 +94,7 @@ This uses the same wiring and download mode as flashing (see below), so it's wor
 ltchiptool flash write bk7231n sprinkler-8z.bin
 ```
 
-(Download `sprinkler-8z.bin` from [Releases](https://github.com/gnacho/esphome-tuya-8zone-valve/releases), or compile `sprinkler-8z.yaml` yourself with ESPHome.)
+(Download `sprinkler-8z.bin` for the 8-zone board or `sprinkler-6z.bin` for the 6-zone variant from [Releases](https://github.com/gnacho/esphome-tuya-8zone-valve/releases), or compile the matching YAML yourself with ESPHome.)
 
 If everything goes well, you'll see a progress bar and at the end "Flash complete".
 
@@ -102,17 +102,17 @@ If everything goes well, you'll see a progress bar and at the end "Flash complet
 
 1. **Unplug the transformer** and disconnect the dupont cables.
 2. **Plug the transformer back in** (only 24VAC, no USB cables).
-3. The board will boot and create a WiFi network called `Sprinkler-8Z Fallback` (password: `12345678`).
+3. The board will boot and create a WiFi network called `Sprinkler-8Z Fallback` (or `Sprinkler-6Z Fallback` on the 6-zone unit; password: `12345678`).
 4. **Connect to that network** with your phone/computer.
 5. A web page will open automatically (or go to `http://192.168.4.1`).
 6. **Enter your WiFi name and password** and save.
-7. The board will connect to your WiFi. From now on, you can access it at `http://sprinkler-8z.local` (or by its IP if you know it).
+7. The board will connect to your WiFi. From now on, you can access it at `http://sprinkler-8z.local` (or `http://sprinkler-6z.local` on the 6-zone unit, or by its IP if you know it).
 
 **Done!** You can now control irrigation from the web or from Home Assistant.
 
 ### Built-in web server
 
-The firmware includes a **web server** with no password. Browse to `http://sprinkler-8z.local` to see the full default configuration out of the box: the 8 zone switches, the irrigation duration sliders (5 min per zone by default), the sprinkler controller controls (start/stop, auto-advance) and the live logs. Everything works standalone — Home Assistant is optional.
+The firmware includes a **web server** with no password. Browse to `http://sprinkler-8z.local` (or `http://sprinkler-6z.local` on the 6-zone unit) to see the full default configuration out of the box: the zone switches, the irrigation duration sliders (5 min per zone by default), the sprinkler controller controls (start/stop, auto-advance) and the live logs. Everything works standalone — Home Assistant is optional.
 
 ### OTA updates (after the first flash)
 
@@ -137,7 +137,7 @@ If you don't press anything for **8 seconds**, the selection is automatically ca
 ### Activate all zones (full cycle)
 
 1. Hold **UP** for **4 seconds** until all LEDs blink
-2. Press circle → all 8 zones activate in full cycle (3 confirmation beeps)
+2. Press circle → all zones activate in full cycle (3 confirmation beeps; all 6 on the TY-W-6L)
 
 ### Stop all irrigation
 
@@ -173,8 +173,10 @@ From the web (`http://sprinkler-8z.local`), each zone has a slider to adjust dur
 
 | File | Description |
 |------|-------------|
-| `sprinkler-8z.yaml` | ESPHome source code (compile it or modify it as you like) |
-| `sprinkler-8z.bin` | **Compiled firmware ready to flash** (download from [Releases](https://github.com/gnacho/esphome-tuya-8zone-valve/releases)) |
+| `sprinkler-8z.yaml` | ESPHome source code for the 8-zone board TY-W-8L (compile it or modify it as you like) |
+| `sprinkler-8z.bin` | **Compiled firmware for the 8-zone board** (download from [Releases](https://github.com/gnacho/esphome-tuya-8zone-valve/releases)) |
+| `sprinkler-6z.yaml` | ESPHome source code for the 6-zone variant TY-W-6L |
+| `sprinkler-6z.bin` | **Compiled firmware for the 6-zone variant** (download from [Releases](https://github.com/gnacho/esphome-tuya-8zone-valve/releases)) |
 | `secrets.yaml.example` | Secrets template (WiFi, API key, OTA password) |
 
 *The old Spanish-named configs (`irrigador-8z*.yaml`) were removed in v1.2.0 — `sprinkler-8z.yaml` is the direct English translation of the former `irrigador-8z-sep.yaml`, identical in functionality.*

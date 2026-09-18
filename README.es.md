@@ -93,7 +93,7 @@ Usa el mismo cableado y modo descarga que el flasheo (ver abajo), así que merec
 ltchiptool flash write bk7231n sprinkler-8z.bin
 ```
 
-(Descarga `sprinkler-8z.bin` de [Releases](https://github.com/gnacho/esphome-tuya-8zone-valve/releases), o compila tú mismo `sprinkler-8z.yaml` con ESPHome.)
+(Descarga `sprinkler-8z.bin` para la placa de 8 zonas o `sprinkler-6z.bin` para la variante de 6 zonas desde [Releases](https://github.com/gnacho/esphome-tuya-8zone-valve/releases), o compila tú mismo el YAML correspondiente con ESPHome.)
 
 Si todo va bien, verás una barra de progreso y al final "Flash complete".
 
@@ -101,17 +101,17 @@ Si todo va bien, verás una barra de progreso y al final "Flash complete".
 
 1. **Desenchufa el transformador** y desconecta los cables dupont.
 2. **Vuelve a enchufar el transformador** (solo 24VAC, sin cables USB).
-3. La placa arrancará y creará una red WiFi llamada `Sprinkler-8Z Fallback` (contraseña: `12345678`).
+3. La placa arrancará y creará una red WiFi llamada `Sprinkler-8Z Fallback` (o `Sprinkler-6Z Fallback` en la unidad de 6 zonas; contraseña: `12345678`).
 4. **Conéctate a esa red** con tu móvil/ordenador.
 5. Se abrirá automáticamente una página web (o ve a `http://192.168.4.1`).
 6. **Introduce el nombre y contraseña de tu WiFi** y guarda.
-7. La placa se conectará a tu WiFi. Desde ahora, podrás acceder a ella en `http://sprinkler-8z.local` (o por su IP si conoces).
+7. La placa se conectará a tu WiFi. Desde ahora, podrás acceder a ella en `http://sprinkler-8z.local` (o `http://sprinkler-6z.local` en la unidad de 6 zonas, o por su IP si la conoces).
 
 **¡Listo!** Ya puedes controlar el riego desde la web o desde Home Assistant.
 
 ### Servidor web integrado
 
-El firmware incluye un **servidor web** sin contraseña. Entra en `http://sprinkler-8z.local` para ver la configuración por defecto nada más arrancar: los 8 interruptores de zona, los deslizadores de duración de riego (5 min por zona por defecto), los controles del controlador de riego (inicio/parada, auto-avance) y los logs en vivo. Todo funciona de forma autónoma — Home Assistant es opcional.
+El firmware incluye un **servidor web** sin contraseña. Entra en `http://sprinkler-8z.local` (o `http://sprinkler-6z.local` en la unidad de 6 zonas) para ver la configuración por defecto nada más arrancar: los interruptores de zona, los deslizadores de duración de riego (5 min por zona por defecto), los controles del controlador de riego (inicio/parada, auto-avance) y los logs en vivo. Todo funciona de forma autónoma — Home Assistant es opcional.
 
 ### Actualizaciones OTA (tras el primer flasheo)
 
@@ -136,7 +136,7 @@ Si no pulsas nada durante **8 segundos**, la selección se cancela automáticame
 ### Activar todas las zonas (ciclo completo)
 
 1. Mantén **UP** presionado **4 segundos** hasta que todos los LEDs parpadeen
-2. Pulsa círculo → se activan las 8 zonas en ciclo completo (3 pitidos de confirmación)
+2. Pulsa círculo → se activan todas las zonas en ciclo completo (3 pitidos de confirmación; las 6 en el TY-W-6L)
 
 ### Parar todo el riego
 
@@ -175,8 +175,10 @@ Desde la web (`http://sprinkler-8z.local`), cada zona tiene un control deslizant
 
 | Archivo | Descripción |
 |---------|-------------|
-| `sprinkler-8z.yaml` | Código fuente ESPHome (compílalo o modifícalo a tu gusto) |
-| `sprinkler-8z.bin` | **Firmware compilado listo para flashear** (descargar de [Releases](https://github.com/gnacho/esphome-tuya-8zone-valve/releases)) |
+| `sprinkler-8z.yaml` | Código fuente ESPHome para la placa de 8 zonas TY-W-8L (compílalo o modifícalo a tu gusto) |
+| `sprinkler-8z.bin` | **Firmware compilado para la placa de 8 zonas** (descargar de [Releases](https://github.com/gnacho/esphome-tuya-8zone-valve/releases)) |
+| `sprinkler-6z.yaml` | Código fuente ESPHome para la variante de 6 zonas TY-W-6L |
+| `sprinkler-6z.bin` | **Firmware compilado para la variante de 6 zonas** (descargar de [Releases](https://github.com/gnacho/esphome-tuya-8zone-valve/releases)) |
 | `secrets.yaml.example` | Plantilla de secretos (WiFi, API key, OTA password) |
 
 *Las configs antiguas con nombre en español (`irrigador-8z*.yaml`) se eliminaron en v1.2.0 — `sprinkler-8z.yaml` es la traducción directa al inglés del antiguo `irrigador-8z-sep.yaml`, idéntica en funcionalidad.*
