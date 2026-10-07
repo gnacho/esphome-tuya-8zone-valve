@@ -91,7 +91,7 @@ This uses the same wiring and download mode as flashing (see below), so it's wor
 4. **Immediately after**, run in the terminal:
 
 ```bash
-ltchiptool flash write bk7231n sprinkler-8z.bin
+ltchiptool flash write sprinkler-8z.bin
 ```
 
 (Download `sprinkler-8z.bin` for the 8-zone board or `sprinkler-6z.bin` for the 6-zone variant from [Releases](https://github.com/gnacho/esphome-tuya-8zone-valve/releases), or compile the matching YAML yourself with ESPHome.)
