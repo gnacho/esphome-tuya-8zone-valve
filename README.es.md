@@ -90,7 +90,7 @@ Usa el mismo cableado y modo descarga que el flasheo (ver abajo), así que merec
 4. **Inmediatamente después**, ejecuta en la terminal:
 
 ```bash
-ltchiptool flash write bk7231n sprinkler-8z.bin
+ltchiptool flash write sprinkler-8z.bin
 ```
 
 (Descarga `sprinkler-8z.bin` para la placa de 8 zonas o `sprinkler-6z.bin` para la variante de 6 zonas desde [Releases](https://github.com/gnacho/esphome-tuya-8zone-valve/releases), o compila tú mismo el YAML correspondiente con ESPHome.)
