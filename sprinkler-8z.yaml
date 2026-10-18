@@ -29,19 +29,15 @@ logger:
   level: DEBUG
 
 api:
-  encryption:
-    key: !secret api_key
 
 ota:
   - platform: esphome
-    password: !secret ota_password
 
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
   ap:
     ssid: "Sprinkler-8Z Fallback"
-    password: "12345678"
 
 captive_portal:
 web_server:
