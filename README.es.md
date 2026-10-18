@@ -101,11 +101,13 @@ Si todo va bien, verás una barra de progreso y al final "Flash complete".
 
 1. **Desenchufa el transformador** y desconecta los cables dupont.
 2. **Vuelve a enchufar el transformador** (solo 24VAC, sin cables USB).
-3. La placa arrancará y creará una red WiFi llamada `Sprinkler-8Z Fallback` (o `Sprinkler-6Z Fallback` en la unidad de 6 zonas; contraseña: `12345678`).
+3. La placa arrancará y creará una red WiFi abierta llamada `Sprinkler-8Z Fallback` (o `Sprinkler-6Z Fallback` en la unidad de 6 zonas, sin contraseña).
 4. **Conéctate a esa red** con tu móvil/ordenador.
 5. Se abrirá automáticamente una página web (o ve a `http://192.168.4.1`).
 6. **Introduce el nombre y contraseña de tu WiFi** y guarda.
 7. La placa se conectará a tu WiFi. Desde ahora, podrás acceder a ella en `http://sprinkler-8z.local` (o `http://sprinkler-6z.local` en la unidad de 6 zonas, o por su IP si la conoces).
+
+> **Problema conocido (AP de fallback):** si la placa pierde después tu WiFi (contraseña cambiada, cambio de router, fuera de alcance), vuelve a abrir el AP de fallback para que puedas corregirlo. En BK7231N ese AP de fallback actualmente no acepta conexiones, así que la recuperación en ese caso es flashear de nuevo por UART (Paso 2). Es un bug upstream ([libretiny#424](https://github.com/libretiny-eu/libretiny/issues/424), [esphome#19430](https://github.com/esphome/esphome/issues/19430)). La configuración inicial con los binarios precompilados no se ve afectada: arrancan directamente en el AP abierto y el captive portal funciona.
 
 **¡Listo!** Ya puedes controlar el riego desde la web o desde Home Assistant.
 

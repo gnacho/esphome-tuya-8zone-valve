@@ -102,11 +102,13 @@ If everything goes well, you'll see a progress bar and at the end "Flash complet
 
 1. **Unplug the transformer** and disconnect the dupont cables.
 2. **Plug the transformer back in** (only 24VAC, no USB cables).
-3. The board will boot and create a WiFi network called `Sprinkler-8Z Fallback` (or `Sprinkler-6Z Fallback` on the 6-zone unit; password: `12345678`).
+3. The board will boot and create an open WiFi network called `Sprinkler-8Z Fallback` (or `Sprinkler-6Z Fallback` on the 6-zone unit, no password).
 4. **Connect to that network** with your phone/computer.
 5. A web page will open automatically (or go to `http://192.168.4.1`).
 6. **Enter your WiFi name and password** and save.
 7. The board will connect to your WiFi. From now on, you can access it at `http://sprinkler-8z.local` (or `http://sprinkler-6z.local` on the 6-zone unit, or by its IP if you know it).
+
+> **Known issue (fallback AP):** if the board later loses your WiFi (wrong password, router change, out of range), it opens the fallback AP again so you can fix it. On BK7231N that fallback AP currently does not accept connections, so recovery in that situation means flashing again over UART (Step 2). This is an upstream bug ([libretiny#424](https://github.com/libretiny-eu/libretiny/issues/424), [esphome#19430](https://github.com/esphome/esphome/issues/19430)). First-time setup with the prebuilt binaries is not affected: they boot straight into the open AP and the captive portal works.
 
 **Done!** You can now control irrigation from the web or from Home Assistant.
 
