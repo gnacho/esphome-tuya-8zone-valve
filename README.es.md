@@ -107,7 +107,7 @@ Si todo va bien, verás una barra de progreso y al final "Flash complete".
 6. **Introduce el nombre y contraseña de tu WiFi** y guarda.
 7. La placa se conectará a tu WiFi. Desde ahora, podrás acceder a ella en `http://sprinkler-8z.local` (o `http://sprinkler-6z.local` en la unidad de 6 zonas, o por su IP si la conoces).
 
-> **Problema conocido (AP de fallback):** si la placa pierde después tu WiFi (contraseña cambiada, cambio de router, fuera de alcance), vuelve a abrir el AP de fallback para que puedas corregirlo. En BK7231N ese AP de fallback actualmente no acepta conexiones, así que la recuperación en ese caso es flashear de nuevo por UART (Paso 2). Es un bug upstream ([libretiny#424](https://github.com/libretiny-eu/libretiny/issues/424), [esphome#19430](https://github.com/esphome/esphome/issues/19430)). La configuración inicial con los binarios precompilados no se ve afectada: arrancan directamente en el AP abierto y el captive portal funciona.
+> **Problema conocido (AP de fallback):** si la placa pierde después tu WiFi (contraseña cambiada, cambio de router, fuera de alcance), vuelve a abrir el AP de fallback para que puedas corregirlo. En BK7231N ese AP de fallback actualmente no acepta conexiones, así que la recuperación en ese caso es flashear de nuevo por UART (Paso 2). Es un bug upstream ([libretiny#424](https://github.com/libretiny-eu/libretiny/issues/424), [esphome#19430](https://github.com/esphome/esphome/issues/19430)). La configuración inicial con los binarios precompilados no se ve afectada: arrancan directamente en el AP abierto y el captive portal funciona. Ver [Solución de problemas](#solución-de-problemas) más abajo: solo reflashear NO basta si ya guardaste credenciales.
 
 **¡Listo!** Ya puedes controlar el riego desde la web o desde Home Assistant.
 
@@ -118,6 +118,38 @@ El firmware incluye un **servidor web** sin contraseña. Entra en `http://sprink
 ### Actualizaciones OTA (tras el primer flasheo)
 
 El cableado USB-TTL solo hace falta **una vez**. Después del primer flasheo, todas las actualizaciones de firmware se hacen **por OTA** vía WiFi: edita `sprinkler-8z.yaml` si quieres y ejecuta `esphome run sprinkler-8z.yaml` (o usa el dashboard de ESPHome). No hace falta abrir la caja ni tocar RST/GND otra vez.
+
+## Solución de problemas
+
+### El AP de fallback aparece pero rechaza conexiones
+
+Pasa tras guardar credenciales WiFi que el dispositivo no consigue conectar (contraseña errónea, red solo de 5 GHz, WPA3, o una mesh con roaming 802.11r/k/v). El dispositivo acaba en el modo fallback AP+STA de ESPHome, que hoy está roto en BK7231N: el AP emite beacons pero nunca completa las asociaciones ([libretiny#424](https://github.com/libretiny-eu/libretiny/issues/424), [esphome#19430](https://github.com/esphome/esphome/issues/19430)).
+
+Importante: las credenciales guardadas se almacenan en una pequeña base de datos en flash (FlashDB "kvs"), **no** en la imagen del firmware. Reflashear el mismo (o cualquier) firmware **no** las elimina, así que el dispositivo vuelve a arrancar siempre en el modo roto. Para recuperarlo:
+
+1. Conéctate por UART como en el [Paso 2](#paso-2-flashear-esphome) (alimentación 24VAC, solo GND/TX/RX del adaptador, modo download con RST a GND).
+2. Borra el almacén de credenciales (en `0x1D3000`, 32 KiB en placas CBU):
+
+```bash
+dd if=/dev/zero of=kvs_clear.bin bs=1024 count=32   # Linux/macOS; en Windows, crea cualquier fichero de 32 KiB
+ltchiptool flash write kvs_clear.bin -f bk7231n -s 0x1D3000
+```
+
+3. Flashea el firmware como siempre:
+
+```bash
+ltchiptool flash write sprinkler-8z.bin
+```
+
+La placa arranca ahora sin credenciales guardadas y vuelve a abrir el AP abierto, que sí funciona.
+
+(Si conservaste el backup de stock del [Paso 1](#paso-1-backup-del-firmware-original-recomendado), volcar de nuevo ese volcado completo de 2 MB también borra las credenciales guardadas.)
+
+### El WiFi no conecta en absoluto
+
+- El BK7231N es **solo de 2.4 GHz, WPA2**. Causas habituales de fallo: redes mesh con band steering o roaming 802.11r/k/v, modo de transición WPA3, y hotspots de móvil configurados en 5 GHz y/o WPA3.
+- Prueba una SSID plana de 2.4 GHz solo-WPA2.
+- Tras guardar las credenciales en el captive portal, la primera conexión puede quedarse colgada hasta un **ciclo de alimentación** ([esphome#19430](https://github.com/esphome/esphome/issues/19430)): desenchufa el transformador unos segundos y vuelve a enchufarlo.
 
 ## Uso de los botones
 

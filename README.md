@@ -108,7 +108,7 @@ If everything goes well, you'll see a progress bar and at the end "Flash complet
 6. **Enter your WiFi name and password** and save.
 7. The board will connect to your WiFi. From now on, you can access it at `http://sprinkler-8z.local` (or `http://sprinkler-6z.local` on the 6-zone unit, or by its IP if you know it).
 
-> **Known issue (fallback AP):** if the board later loses your WiFi (wrong password, router change, out of range), it opens the fallback AP again so you can fix it. On BK7231N that fallback AP currently does not accept connections, so recovery in that situation means flashing again over UART (Step 2). This is an upstream bug ([libretiny#424](https://github.com/libretiny-eu/libretiny/issues/424), [esphome#19430](https://github.com/esphome/esphome/issues/19430)). First-time setup with the prebuilt binaries is not affected: they boot straight into the open AP and the captive portal works.
+> **Known issue (fallback AP):** if the board later loses your WiFi (wrong password, router change, out of range), it opens the fallback AP again so you can fix it. On BK7231N that fallback AP currently does not accept connections, so recovery in that situation means flashing again over UART (Step 2). This is an upstream bug ([libretiny#424](https://github.com/libretiny-eu/libretiny/issues/424), [esphome#19430](https://github.com/esphome/esphome/issues/19430)). First-time setup with the prebuilt binaries is not affected: they boot straight into the open AP and the captive portal works. See [Troubleshooting](#troubleshooting) below - reflashing alone is not enough if you already saved credentials.
 
 **Done!** You can now control irrigation from the web or from Home Assistant.
 
@@ -119,6 +119,38 @@ The firmware includes a **web server** with no password. Browse to `http://sprin
 ### OTA updates (after the first flash)
 
 The USB-TTL wiring is only needed **once**. After the first flash, all future firmware updates are done **over the air (OTA)** over WiFi: edit `sprinkler-8z.yaml` if you want, then run `esphome run sprinkler-8z.yaml` (or use the ESPHome dashboard). No need to open the case or touch RST/GND again.
+
+## Troubleshooting
+
+### The fallback AP appears but refuses connections
+
+This happens after you save WiFi credentials that the device cannot connect to (wrong password, 5 GHz-only network, WPA3, or a mesh with 802.11r/k/v roaming). The device ends up in ESPHome's fallback AP+STA mode, which is currently broken on BK7231N: the AP beacons but never completes associations ([libretiny#424](https://github.com/libretiny-eu/libretiny/issues/424), [esphome#19430](https://github.com/esphome/esphome/issues/19430)).
+
+Important: the saved credentials are stored in a small flash database (FlashDB "kvs"), **not** in the firmware image. Reflashing the same (or any) firmware does **not** remove them, so the device keeps booting into the broken mode. To recover:
+
+1. Connect over UART as in [Step 2](#step-2-flash-esphome) (24VAC power, only GND/TX/RX from the adapter, download mode with RST to GND).
+2. Erase the credential storage (at `0x1D3000`, 32 KiB on CBU boards):
+
+```bash
+dd if=/dev/zero of=kvs_clear.bin bs=1024 count=32   # Linux/macOS; on Windows, create any 32 KiB file
+ltchiptool flash write kvs_clear.bin -f bk7231n -s 0x1D3000
+```
+
+3. Reflash the firmware as usual:
+
+```bash
+ltchiptool flash write sprinkler-8z.bin
+```
+
+The board now boots with no stored credentials and opens the working open AP again.
+
+(If you kept the stock backup from [Step 1](#step-1-back-up-the-original-firmware-recommended), writing that full 2 MB dump back also wipes the stored credentials.)
+
+### WiFi won't connect at all
+
+- BK7231N is **2.4 GHz only, WPA2**. Common causes of failure: mesh networks with band steering or 802.11r/k/v fast roaming, WPA3 transition mode, and phone hotspots configured for 5 GHz and/or WPA3.
+- Try a plain 2.4 GHz WPA2-only SSID.
+- After saving credentials in the captive portal, the first connection can hang until a **power cycle** ([esphome#19430](https://github.com/esphome/esphome/issues/19430)): unplug the transformer for a few seconds and plug it back in.
 
 ## Using the buttons
 
